@@ -1,10 +1,13 @@
 import uvicorn
 import httpx
+import webbrowser # 导入浏览器控制模块
+from threading import Timer # 导入定时器
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+
 # import os
 # os.environ["HTTP_PROXY"] = "http://localhost:7890"
 # os.environ["HTTPS_PROXY"] = "http://localhost:7890"
@@ -30,6 +33,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+def open_browser():
+    """打开本地浏览器跳转到新手指南"""
+    # 使用 127.0.0.1 确保本地访问的稳定性
+    url = "http://127.0.0.1:8000/guide.html"
+    webbrowser.open(url)
 
 # ==========================================
 # 3. 定义数据模型
@@ -113,4 +122,5 @@ async def chat_endpoint(req: ChatRequest):
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
+    Timer(1.5, open_browser).start()
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
